@@ -1,0 +1,154 @@
+from pathlib import Path
+
+html = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste Completo de Autoconhecimento</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:1100px;margin:auto;padding:20px;background:#f5f7fa}
+.card{background:#fff;padding:20px;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.question{margin:14px 0;padding:10px;border-bottom:1px solid #eee}
+.progress{height:18px;background:#ddd;border-radius:20px;overflow:hidden;margin:15px 0}
+.bar{height:100%;background:#4a6cf7;width:0%}
+.result{display:none;margin-top:20px}
+label{margin-right:8px}
+button{padding:12px 18px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Teste Completo de Autoconhecimento</h1>
+<p>65 perguntas • Temperamentos + Perfil Comportamental</p>
+<div class="progress"><div id="bar" class="bar"></div></div>
+<div id="q"></div>
+<button onclick="calc()">Gerar Relatório</button>
+<div id="r" class="result"></div>
+</div>
+
+<script>
+const perguntas = [
+["Prefiro estabilidade a mudanças frequentes.","F"],
+["Costumo revisar decisões antes de agir.","M"],
+["Assumo liderança quando necessário.","C"],
+["Gosto de conhecer pessoas novas.","S"],
+["Evito conflitos desnecessários.","F"],
+["Sou muito autocrítico.","M"],
+["Fico impaciente com incompetência.","C"],
+["Conversar com pessoas me energiza.","S"],
+["Mantenho a calma sob pressão.","F"],
+["Analiso detalhes que outros ignoram.","M"],
+["Busco resultados concretos.","C"],
+["Tenho facilidade para improvisar.","S"],
+["Prefiro ouvir antes de falar.","F"],
+["Demoro a confiar novamente após decepções.","M"],
+["Defendo minhas opiniões quando necessário.","C"],
+["Costumo animar grupos.","S"],
+["Valorizo rotina.","F"],
+["Planejo antes de executar.","M"],
+["Tomo decisões difíceis sem muita hesitação.","C"],
+["Gosto de variedade e novidade.","S"],
+["As pessoas me consideram equilibrado.","F"],
+["Tenho padrões elevados para mim.","M"],
+["Competições me motivam.","C"],
+["Faço amizades com facilidade.","S"],
+["Evito chamar atenção para mim.","F"],
+["Percebo falhas rapidamente.","M"],
+["Gosto de assumir responsabilidades.","C"],
+["Falo espontaneamente.","S"],
+["Prefiro relações profundas a muitas superficiais.","F"],
+["Reflito sobre erros passados.","M"],
+["Persisto diante de obstáculos.","C"],
+["Sou comunicativo em ambientes sociais.","S"],
+["Busco harmonia entre as pessoas.","F"],
+["Tenho tendência ao perfeccionismo.","M"],
+["Quero eficiência nos processos.","C"],
+["Gosto de experiências diferentes.","S"],
+["Penso antes de reagir emocionalmente.","F"],
+["Sou cuidadoso com compromissos.","M"],
+["Sinto necessidade de avançar objetivos.","C"],
+["Fico confortável em grupos grandes.","S"],
+["Sou paciente.","F"],
+["Analiso riscos antes de agir.","M"],
+["Resultados importam mais que reconhecimento.","C"],
+["Costumo iniciar conversas.","S"],
+["Tenho facilidade para mediar conflitos.","F"],
+["Levo responsabilidades a sério.","M"],
+["Assumo controle quando falta direção.","C"],
+["Gosto de ser notado.","S"],
+["Prefiro previsibilidade.","F"],
+["Organização aumenta meu desempenho.","M"],
+["Aceito desafios difíceis.","C"],
+["Busco interação social frequente.","S"],
+["Raramente ajo por impulso.","F"],
+["Costumo avaliar consequências futuras.","M"],
+["Tenho perfil competitivo.","C"],
+["Sou entusiasmado em novos projetos.","S"],
+["Valorizo consistência.","F"],
+["Sou criterioso nas escolhas.","M"],
+["Tenho facilidade para dizer não.","C"],
+["Expresso emoções com facilidade.","S"],
+["Prefiro observar antes de participar.","F"],
+["Reviso trabalhos antes de concluir.","M"],
+["Gosto de influenciar resultados.","C"],
+["Tenho energia social elevada.","S"],
+["Minhas respostas foram sinceras.","V"]
+];
+
+const div=document.getElementById('q');
+perguntas.forEach((p,i)=>{
+div.innerHTML += `<div class='question'><b>${i+1}. ${p[0]}</b><br>
+${[1,2,3,4,5].map(v=>`<label><input type='radio' name='q${i}' value='${v}' onchange='upd()'>${v}</label>`).join('')}
+</div>`;
+});
+
+function upd(){
+let c=document.querySelectorAll("input:checked").length;
+document.getElementById('bar').style.width=(c/perguntas.length*100)+'%';
+}
+
+function calc(){
+let F=0,M=0,C=0,S=0;
+for(let i=0;i<perguntas.length;i++){
+let r=document.querySelector(`input[name=q${i}]:checked`);
+if(!r){alert("Responda todas as perguntas.");return;}
+let v=parseInt(r.value);
+switch(perguntas[i][1]){
+case "F":F+=v;break;
+case "M":M+=v;break;
+case "C":C+=v;break;
+case "S":S+=v;break;
+}
+}
+let total=F+M+C+S;
+let pf=Math.round(F/total*100), pm=Math.round(M/total*100),
+pc=Math.round(C/total*100), ps=Math.round(S/total*100);
+
+let arr=[["Fleumático",pf],["Melancólico",pm],["Colérico",pc],["Sanguíneo",ps]].sort((a,b)=>b[1]-a[1]);
+
+let txt=`<h2>Relatório</h2>
+<p><b>Perfil predominante:</b> ${arr[0][0]} (${arr[0][1]}%)</p>
+<p><b>Perfil secundário:</b> ${arr[1][0]} (${arr[1][1]}%)</p>
+<h3>Distribuição</h3>
+<ul><li>Fleumático: ${pf}%</li><li>Melancólico: ${pm}%</li><li>Colérico: ${pc}%</li><li>Sanguíneo: ${ps}%</li></ul>
+<h3>Interpretação</h3>
+<p>O perfil predominante representa sua tendência natural. O secundário mostra como você reage em ambientes específicos, pressão ou relacionamentos.</p>
+<p><b>Fleumático:</b> estabilidade, equilíbrio e diplomacia.</p>
+<p><b>Melancólico:</b> análise, profundidade e autocobrança.</p>
+<p><b>Colérico:</b> assertividade, liderança e foco em resultados.</p>
+<p><b>Sanguíneo:</b> sociabilidade, entusiasmo e adaptabilidade.</p>
+<h3>Reflexão Pessoal</h3>
+<p>Observe quais traços favorecem seus objetivos e quais podem limitar seu crescimento. O autoconhecimento é mais útil quando gera ações práticas de desenvolvimento.</p>`;
+
+document.getElementById('r').innerHTML=txt;
+document.getElementById('r').style.display='block';
+}
+</script>
+</body>
+</html>
+"""
+path="/mnt/data/Teste_Autoconhecimento_Completo_v1.html"
+Path(path).write_text(html,encoding="utf-8")
+print(path)
